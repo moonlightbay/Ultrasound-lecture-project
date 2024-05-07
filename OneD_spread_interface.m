@@ -47,7 +47,7 @@ k = omega / wave_speed; % 波数
 
 %探究狄利克雷边界条件
 for m = 2:time_grid_num-1 % 时间迭代
-    if m * dt < 1
+    if m * dt < 0.5
         P(1, m) = p0 * sin(omega * m * dt); % 左边界（波源）
     end
     for n = 2:space_grid_num-1 % 空间迭代
@@ -75,7 +75,7 @@ close(gcf);
 
 %2.第二类边界条件：∂P/∂z(0,t) = 0, ∂P/∂z(L,t) = 0
 for m = 2:time_grid_num-1 % 时间迭代
-    if m * dt < 1
+    if m * dt < 0.5
         P(1, m) = p0 * sin(omega * m * dt); % 左边界（波源）
     end
     for n = 2:600-1 % 空间迭代    
@@ -101,7 +101,7 @@ close(gcf);
 
 % 一阶吸收边界条件
 for m = 2:time_grid_num-1 % 时间迭代
-    if m * dt < 1
+    if m * dt < 0.5
         P(1, m) = p0 * sin(omega * m * dt); % 左边界（波源）
     end
     for n = 2:space_grid_num-1 % 空间迭代
@@ -132,3 +132,6 @@ for m = 1:time_grid_num
 end
 % Close the figure and exit
 close(gcf);
+
+%参考：https://wuli.wiki/online/W1dNum.html
+%参考：https://hplgit.github.io/num-methods-for-PDEs/doc/pub/wave/sphinx/._main_wave003.html#problem-11-implement-open-boundary-conditions
