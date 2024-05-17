@@ -20,7 +20,7 @@ import math.*
 %∂P/∂z ≈ (P(t,z+Δz) - P(t,z)) / Δz = 0
 %=> P(t,z+Δz) = P(t,z)
 
-%3.open boundary 条件：
+%3.辐射边界条件：
 %∂P/∂t +c*∂P/∂z = 0 =>∂P/∂z = -1/c * ∂P/∂t
 %∂P/∂z = (P(t,z+Δz) - P(t,z))/Δz = -1/c * ∂P/∂t = -1/c * (P(t+Δt,z) - P(t,z))/Δt
 %=> P(t,z+Δz) = P(t,z) - 1/c * (P(t+Δt,z) - P(t,z)) * Δz/Δt
@@ -28,21 +28,19 @@ import math.*
 %----------------------------------------------------------------------------------
 
 
-% 设定参数
-wave_speed = 1; % 波速
-space_length = 10; % 空间长度
-time_length = 10; % 时间长度
+% 声场参数
+wave_speed = 1; % 波速,km/s
+space_length = 10; % 空间长度,mm
+time_length = 10; % 时间长度,ns
 space_grid_num = 1000; % 空间网格数
 time_grid_num = 1000; % 时间网格数
 dz = space_length / space_grid_num; % 空间步长
 dt = time_length / time_grid_num; % 时间步长
 P = zeros(space_grid_num, time_grid_num); % 零初始化P域
 
-% 对于平面正弦波： p = p0 * sin(ωt - kz)
-% 色散公式： k^2 = ρ0 * K * ω^2  =>  k = ω / c
-
+% 波源参数
 p0 = 1; % 振幅
-omega = 2*pi; % 角频率
+omega = 2*pi; % 角频率,1e6 rad/s
 k = omega / wave_speed; % 波数
 
 %探究狄利克雷边界条件
@@ -99,20 +97,18 @@ end
 close(gcf);
 
 
-% 一阶吸收边界条件
+% 辐射边界条件
 for m = 2:time_grid_num-1 % 时间迭代
     if m * dt < 0.5
         P(1, m) = p0 * sin(omega * m * dt); % 左边界（波源）
     end
-    for n = 2:space_grid_num-1 % 空间迭代
+    for n = 2:600 % 空间迭代，截止到界面
         % 更新内部点
         P(n, m+1) = 2 * P(n, m) - P(n, m-1) + (wave_speed * dt / dz)^2 * (P(n+1, m) - 2 * P(n, m) + P(n-1, m));
-
         % 一阶吸收边界条件，适用于右边界
         if n == 600 % 假设从索引600开始到边界是需要吸收的区域
-            % 在这里实施一阶吸收边界条件
+            % 在这里实施辐射边界条件
             P(600,m+1) = P(599,m+1) - 1/wave_speed * (P(599,m+1) - P(599,m))*dz/dt;
-            
         end
     end
 end

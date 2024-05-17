@@ -1,4 +1,5 @@
 % 此代码基于一维P波波动方程（无衰减）实现波的反射/透射现象。
+% 按q可退出当前的图像。
 
 % 一维波动方程
 % ∂^2 P / ∂ t^2 = c^2 * ∂^2 P / ∂ z^2
@@ -36,14 +37,15 @@
 %一阶边界条件的离散化
 
 %-----------------------------------------------------------------------------------
-
+close all;
+clc;clear all;
 import math.*
-clear all;
+
 % 设定声场参数
 space_length = 10; % 空间长度
 time_length = 10; % 时间长度
 space_grid_num = 1000; % 空间网格数
-time_grid_num = 2000; % 时间网格数
+time_grid_num = 1500; % 时间网格数
 dz = space_length / space_grid_num; % 空间步长
 dt = time_length / time_grid_num; % 时间步长
 P = zeros(space_grid_num, time_grid_num); % 零初始化P域
@@ -85,6 +87,8 @@ for m = 1:3:time_grid_num % Increase the step size to plot at a higher frequency
     plot(P(:, m));
     ylim([-5, 5]);
     line([600, 600], [-5, 5], 'Color', 'r', 'LineStyle', '--'); % 在x=600处画一条线
+    [pks, locs] = findpeaks(abs(P(:, m)),"MinPeakHeight",0.1);
+    text(locs, P(locs,m), num2str(pks));
     drawnow;
     if strcmpi(get(gcf, 'currentkey'), 'q') % 按下q键退出
         break;
