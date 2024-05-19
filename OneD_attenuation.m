@@ -12,7 +12,7 @@ clc;
 space_length = 10; % 空间长度
 time_length = 10; % 时间长度
 space_grid_num = 1000; % 空间网格数
-time_grid_num = 2000; % 时间网格数
+time_grid_num = 1000; % 时间网格数
 dz = space_length / space_grid_num; % 空间步长
 dt = time_length / time_grid_num; % 时间步长
 P = zeros(space_grid_num, time_grid_num); % 零初始化P域
@@ -22,11 +22,8 @@ omega = 2*pi; % 角频率
 
 % 设定声场参数
 c1 = 1; % 介质1波速
-c2 = 1.5; % 介质2波速
+c2 = 0.5; % 介质2波速
 b = 0.05; % 空间衰减系数
-alpha1 = 0.2;  % 介质1的空间衰减系数
-alpha2 = 0.2;   % 介质2的空间衰减系数
-
 
 
 % 迭代计算每个时间步
@@ -55,17 +52,32 @@ for m = 1:3:time_grid_num % Increase the step size to plot at a higher frequency
     % 使用寻峰函数找到峰值并在图像上显示
     [pks, locs] = findpeaks(P(:, m),"MinPeakHeight",0.1);
     text(locs, pks+0.2, num2str(pks));
-    
     drawnow;
     if strcmpi(get(gcf, 'currentkey'), 'q') % 按下q键退出
         break;
     end
 end
 
-
 % Close the figure and exit
 close(gcf);
 
+for m = 1:time_grid_num
+    %如果时间为整数秒
+    if mod(m, 100) == 0
+        %绘制波动图
+        figure;
+        plot(P(:, m));
+        ylim([-5, 5]);
+        line([600, 600], [-5, 5], 'Color', 'r', 'LineStyle', '--'); % 在x=600处画一条线
+        % 使用寻峰函数找到峰值并在图像上显示
+        [pks, locs] = findpeaks(abs(P(:, m)),"MinPeakHeight",0.1);
+        text(locs, pks+0.2, num2str((pks)));
+        text(locs, pks+0.6, num2str(m));
+        %输出到终端
+        disp([num2str(m), '  ', num2str(max(pks'))]);
+        drawnow;
+    end
+end
 
 
 

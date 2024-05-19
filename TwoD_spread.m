@@ -36,7 +36,7 @@ for t = 1:Nt
     p_next(Nx, :) = p_next(Nx-1, :) - 1/c * (p_next(Nx-1, :) - p(Nx-1, :)) * dx/dt; %下边界
     p_next(:, Ny) = p_next(:, Ny-1) - 1/c * (p_next(:, Ny-1) - p(:, Ny-1)) * dy/dt; %右边界
     p_next(:, 1) = p_next(:, 2) - 1/c * (p_next(:, 2) - p(:, 2)) * dy/dt;
-
+    % p_next(1, :) = p_next(2, :) - 1/c * (p_next(2, :) - p(2, :)) * dx/dt;    %上边界
     % 更新波场
     p_prev = p;
     p = p_next;
@@ -54,4 +54,5 @@ for t = 1:Nt
         break;
     end
 end
+
 

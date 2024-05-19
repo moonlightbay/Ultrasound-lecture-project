@@ -7,7 +7,7 @@ Nx = 200;   % x方向的网格点数
 Ny = 200;   % y方向的网格点数
 c = 1500;   % 声速(m/s)
 dt = 1e-6;  % 时间步长(s)
-Nt = 2000;   % 时间步数
+Nt = 1000;   % 时间步数
 dx = 0.01;  % 空间步长(m)
 dy = 0.01;  % 空间步长(m)
 c2 = 2000;  % 声速(m/s)
@@ -16,6 +16,7 @@ c2 = 2000;  % 声速(m/s)
 p = zeros(Nx, Ny);
 p_prev = zeros(Nx, Ny);
 p_next = zeros(Nx, Ny);
+p0 = zeros(Nt);  % 记录波源中心的幅度情况
 
 % 初始条件（波源）
 x0 = 2;
@@ -23,13 +24,15 @@ x0 = 2;
 y0 = 90:2:110;
 % 波源为单个点
 % y0 = 100;
+% 波源脉冲
 p(x0, y0) = 1;
 
 % 时间演化
 for t = 1:Nt
     for i = 2:Nx-1
         for j = 2:Ny-1
-            if sqrt((i-100)^2 + (j-100)^2) < 10
+            if abs(i-50) <= 10    %介质层
+            % if sqrt((i-100)^2 + (j-100)^2) < 10   %介质小球
                 % 介质小球内的声速为c2        
                 p_next(i, j) = 2*p(i, j) - p_prev(i, j) + c2^2 * dt^2 / dx^2 * (p(i+1, j) + p(i-1, j) + p(i, j+1) + p(i, j-1) - 4*p(i, j));
             else
@@ -41,7 +44,8 @@ for t = 1:Nt
     % 边界条件， 一阶吸收边界条件
     p_next(Nx, :) = p_next(Nx-1, :) - 1/c * (p_next(Nx-1, :) - p(Nx-1, :)) * dx/dt; %下边界
     p_next(:, Ny) = p_next(:, Ny-1) - 1/c * (p_next(:, Ny-1) - p(:, Ny-1)) * dy/dt; %右边界
-    p_next(:, 1) = p_next(:, 2) - 1/c * (p_next(:, 2) - p(:, 2)) * dy/dt;
+    p_next(:, 1) = p_next(:, 2) - 1/c * (p_next(:, 2) - p(:, 2)) * dy/dt;    %左边界
+    p_next(1, :) = p_next(2, :) - 1/c * (p_next(2, :) - p(2, :)) * dx/dt;    %上边界
 
     % 更新波场
     p_prev = p;
@@ -53,13 +57,22 @@ for t = 1:Nt
     xlabel('y');
     ylabel('x');
     colorbar;
-    colormap("jet");
-    clim([-0.5,0.5]);
+    colormap('jet');
+    clim([0,1]);
     pause(0.01);
     %按右上角退出绘图
     if ~ishandle(1)
         break;
     end
+
+    %记录波源中心的波场
+    p0(t) = p(x0+1, 100);
 end
 
-
+% 绘制波源中心的波场
+figure;
+plot(p0);
+xlabel('时间步数');
+ylabel('波场幅度');
+title('波源中心的波场随时间的变化');
+grid on;
